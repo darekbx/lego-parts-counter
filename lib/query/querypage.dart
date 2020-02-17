@@ -5,6 +5,7 @@ import 'package:lego_parts_counter/utils/widgetutils.dart';
 
 class QueryPage extends StatefulWidget {
 
+  var _apiInputController = TextEditingController();
   final _localStorage = LocalStorage();
 
   @override
@@ -14,6 +15,7 @@ class QueryPage extends StatefulWidget {
 class _QueryPageState extends State<QueryPage> {
 
   String _numberHint = "";
+  bool _editEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,38 +45,43 @@ class _QueryPageState extends State<QueryPage> {
   Widget _buildPage(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Center(child:
-          DropdownButton<String>(
-            hint: Text("Define, what to search"),
-            onChanged: (String newValue) {
-              setState(() {
-                if (newValue == "Set") {
-                  _numberHint = "Enter set number";
-                } else if (newValue == "Part") {
-                  _numberHint = "Enter part number";
-                }
-              });
-            },
-            items: <String>['Set', 'Part'].map<DropdownMenuItem<String>>((
-                String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          )
-        ),
+        Center(child: Container(child:
+        DropdownButton<String>(
+          hint: Text("Define, what to search"),
+          onChanged: (String newValue) {
+            setState(() {
+              if (newValue == "Set") {
+                _numberHint = "Enter set number";
+              } else if (newValue == "Part") {
+                _numberHint = "Enter part number";
+              }
+              _editEnabled = true;
+            });
+          },
+          items: <String>['Set', 'Part'].map<DropdownMenuItem<String>>((
+              String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ), width: _calculateWidth(context)
+        )),
 
-        TextField(
-          //controller: _apiInputController,
+        Container(child: TextField(
+          controller: widget._apiInputController,
+          enabled: _editEnabled,
           keyboardType: TextInputType.text,
           decoration: InputDecoration(hintText: _numberHint),
+        ), width: _calculateWidth(context)
         )
-
       ],
     );
   }
+
+  _calculateWidth(BuildContext context) => MediaQuery.of(context).size.width / 2;
 
   Widget _buildSettingsAction(BuildContext context) {
     return IconButton(
