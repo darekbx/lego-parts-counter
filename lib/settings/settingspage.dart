@@ -48,7 +48,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   controller: _apiInputController,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(hintText: "API key"),
-                )
+                ),
+                Text("More information, about Rebrickable API key, can be found at https://rebrickable.com/api/")
               ],
             )));
   }
