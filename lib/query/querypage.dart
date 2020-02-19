@@ -16,8 +16,6 @@ class QueryPage extends StatefulWidget {
   final _localStorage = LocalStorage();
   final _typeNameMap = { QueryType.SET: "Set", QueryType.PART: "Part" };
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
   @override
   State<StatefulWidget> createState() => _QueryPageState();
 }
@@ -27,6 +25,20 @@ class _QueryPageState extends State<QueryPage> {
   QueryType _selectedType;
   String _numberHint = "";
   bool _editEnabled = false;
+  bool _hasApiAKey = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkApiKey();
+  }
+
+  void _checkApiKey() async {
+    var result = await widget._localStorage.hasApiKey();
+    setState(() {
+      _hasApiAKey = result;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +47,12 @@ class _QueryPageState extends State<QueryPage> {
             title: Text("Lego Parts"),
             actions: <Widget>[_buildSettingsAction(context)]
         ),
-        body: FutureBuilder(
-            future: _checkApiKeyAndBuild(context),
-            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-              return WidgetUtils.handleFuture(snapshot, (data) => data);
-            }
-        )
+        body: _createBody()
     );
   }
-  Future<Widget> _checkApiKeyAndBuild(BuildContext context) async {
-    if (await widget._localStorage.hasApiKey()) {
+
+  Widget _createBody() {
+    if (_hasApiAKey) {
       return _buildPage(context);
     } else {
       return Center(child: Text(
@@ -53,23 +61,22 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Widget _buildPage(BuildContext context) {
-    return Form(child: Column(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         _createTypeSelect(),
         _createNumberInput()
       ],
-    )
-        , key: widget.formKey);
+    );
   }
 
   _createNumberInput() =>
-      Container(child: TextFormField(
+      Container(child: TextField(
         controller: widget._apiInputController,
         enabled: _editEnabled,
-        //onSubmitted: (number) => _displayResultsPage(number),
-        keyboardType: TextInputType.text,
+        onSubmitted: (number) => _displayResultsPage(number),
+        keyboardType: TextInputType.number,
         decoration: InputDecoration(hintText: _numberHint),
       ), width: _calculateWidth(context));
 

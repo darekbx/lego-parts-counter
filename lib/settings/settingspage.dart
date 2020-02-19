@@ -49,7 +49,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(hintText: "API key"),
                 ),
-                Text("More information, about Rebrickable API key, can be found at https://rebrickable.com/api/")
+                Padding(
+                  padding: EdgeInsets.only(top: 8),
+                    child: Text("More information, about Rebrickable API key, can be found at https://rebrickable.com/api/"))
               ],
             )));
   }
