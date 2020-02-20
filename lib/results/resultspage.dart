@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lego_parts_counter/rebrickable/rebrickableapi.dart';
+import 'package:lego_parts_counter/results/setlist.dart';
 import 'package:lego_parts_counter/storage/localstorage.dart';
 import 'package:lego_parts_counter/utils/widgetutils.dart';
 
@@ -21,7 +22,7 @@ class _ResultsPageState extends State<ResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text("Lego Parts - Set No. ${widget.partNumber ?? widget.setNumber}")
+            title: Text("Lego Parts - results for ${widget.partNumber ?? widget.setNumber}")
         ),
         body: FutureBuilder(
             future: _buildList(context),
@@ -42,9 +43,8 @@ class _ResultsPageState extends State<ResultsPage> {
 
   Future<Widget> _buildSetsList(BuildContext context) async {
     var apiKey = await loadApiKey();
-    var results = await RebrickableApi(apiKey).fetchSetParts(widget.setNumber, 1);
-
-
+    var results = await RebrickableApi(apiKey).searchSets(widget.setNumber, 1);
+    return SetList(results);
   }
 
   Future<Widget> _buildPartsList(BuildContext context) async {
