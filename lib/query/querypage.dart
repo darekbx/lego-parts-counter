@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lego_parts_counter/results/resultspage.dart';
 import 'package:lego_parts_counter/settings/settingspage.dart';
 import 'package:lego_parts_counter/storage/localstorage.dart';
-import 'package:lego_parts_counter/utils/widgetutils.dart';
 
 enum QueryType {
   SET,
@@ -61,34 +60,33 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Widget _buildPage(BuildContext context) {
-    return Column(
+    return Center(child: Container(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         _createTypeSelect(),
         _createNumberInput()
       ],
-    );
+    ), width: _calculateWidth(context)));
   }
 
   _createNumberInput() =>
-      Container(child: TextField(
+      Padding(padding: EdgeInsets.only(left: 24, right: 24), child:
+      TextField(
         controller: widget._apiInputController,
         enabled: _editEnabled,
         onSubmitted: (number) => _displayResultsPage(number),
         keyboardType: TextInputType.number,
         decoration: InputDecoration(hintText: _numberHint),
-      ), width: _calculateWidth(context));
+      ));
 
   _createTypeSelect() =>
-      Center(child: Container(child:
       DropdownButton<QueryType>(
-          value: _selectedType,
-          hint: Text("Define, what to search"),
-          onChanged: (QueryType newValue) => _updateQueryState(newValue),
-          items: _createDropdownItems()
-      ), width: _calculateWidth(context)
-      ));
+        value: _selectedType,
+        hint: Text("Define, what to search"),
+        onChanged: (QueryType newValue) => _updateQueryState(newValue),
+        items: _createDropdownItems(),
+      );
 
   _createDropdownItems() =>
       widget._dropDownItems
@@ -104,6 +102,7 @@ class _QueryPageState extends State<QueryPage> {
 
   _updateQueryState(QueryType type) {
     setState(() {
+      widget._apiInputController.clear();
       _selectedType = type;
       if (type == QueryType.SET) {
         _numberHint = "Enter set number";

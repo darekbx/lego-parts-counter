@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lego_parts_counter/rebrickable/baseresponse.dart';
 import 'package:lego_parts_counter/rebrickable/model/set.dart';
+import 'package:lego_parts_counter/results/setpartspage.dart';
 
 class SetList extends StatelessWidget {
 
@@ -16,10 +17,15 @@ class SetList extends StatelessWidget {
         var result = contents.results[index];
         return
           Card(child: ListTile(
-            leading: Image.network(result.imageUrl),
+            leading: SizedBox(width: 80, child: Image.network(result.imageUrl)),
             title: Text("${result.number} ${result.name}"),
             subtitle: Text(
                 "Year: ${result.year}, Parts count: ${result.partsCount}"),
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(
+                  builder: (context) => SetPartsPage(result.number)));
+            },
           ));
       },
     );
