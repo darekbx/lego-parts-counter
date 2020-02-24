@@ -3,7 +3,6 @@ import 'package:lego_parts_counter/rebrickable/baseresponse.dart';
 import 'package:lego_parts_counter/rebrickable/model/setpart.dart';
 import 'package:lego_parts_counter/rebrickable/rebrickableapi.dart';
 import 'package:lego_parts_counter/storage/localstorage.dart';
-import 'package:lego_parts_counter/utils/widgetutils.dart';
 
 class SetPartsPage extends StatefulWidget {
 
@@ -17,7 +16,32 @@ class SetPartsPage extends StatefulWidget {
 
 class _SetPartsPageState extends State<SetPartsPage> {
 
+  ScrollController _scrollController = new ScrollController();
   BaseResponse<SetPart> contents;
+
+  List<SetPart> _parts = List();
+  int page = 1;
+  bool hasMore = true;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    _loadNextPage();
+    super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _loadNextPage();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,31 +49,60 @@ class _SetPartsPageState extends State<SetPartsPage> {
         appBar: AppBar(
             title: Text("Lego Parts - from ${widget.setNumber}")
         ),
-        body: FutureBuilder(
-            future: _buildList(),
-            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-              return WidgetUtils.handleFuture(snapshot, (data) => data);
-            }
-        )
+        body: _buildList(),
+        resizeToAvoidBottomPadding: false
     );
   }
 
-  Future<Widget> _buildList() async {
-    var apiKey = await loadApiKey();
-    var response = await RebrickableApi(apiKey).fetchSetParts(widget.setNumber, 1);
-
+  Widget _buildList() {
     return ListView.builder(
-      itemCount: response.count,
+      itemCount: _parts.length + 1 /* For progress */,
+      controller: _scrollController,
       itemBuilder: (context, index) {
-        var result = response.results[index];
-        return
-          Card(child: ListTile(
-            leading: SizedBox(width: 80, child: Image.network(result.part.partImgUrl)),
-            title: Text("${result.part.name}, count: ${result.quantity}"),
-            subtitle: Text("In sets: ${result.numSets}"),
-          ));
+        if (index == _parts.length) {
+          return _buildProgressIndicator();
+        } else {
+          var result = _parts[index];
+          return
+            Card(child: ListTile(
+              leading: SizedBox(
+                  width: 80, child: Image.network(result.part.partImgUrl)),
+              title: Text("${result.part.name}, count: ${result.quantity}"),
+              subtitle: Text("In sets: ${result.numSets}"),
+            ));
+        }
       },
     );
+  }
+
+  Widget _buildProgressIndicator() {
+    return new Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: new Center(
+        child: new Opacity(
+          opacity: isLoading ? 1.0 : 00,
+          child: new CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
+
+  void _loadNextPage() async {
+    if (isLoading || !hasMore) {
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+
+    var apiKey = await loadApiKey();
+    var response = await RebrickableApi(apiKey).fetchSetParts(widget.setNumber, page++);
+    hasMore = response.next != null;
+
+    setState(() {
+      isLoading = false;
+      _parts.addAll(response.results);
+    });
   }
 
   Future<String> loadApiKey() async => await LocalStorage().getApiKey();

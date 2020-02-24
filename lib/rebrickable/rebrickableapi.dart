@@ -70,7 +70,7 @@ class RebrickableApi {
     if (response.statusCode == 200) {
       var jsonBody = json.decode(response.body);
       var items = (jsonBody["results"] as List).map((item) => converter(item) as T);
-      return BaseResponse<T>(jsonBody["count"] as int, items.toList());
+      return BaseResponse<T>(jsonBody["count"] as int, jsonBody["next"], items.toList());
     } else {
       throw HttpException("Exception code ${response.statusCode}");
     }
