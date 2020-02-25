@@ -50,7 +50,7 @@ class _ResultsPageState extends State<ResultsPage> {
 
   Future<Widget> _buildPartsList(BuildContext context) async {
     var apiKey = await loadApiKey();
-    var result = await RebrickableApi(apiKey).searchPart(widget.partNumber, 1);
+    var result = await RebrickableApi(apiKey).searchPart(widget.partNumber);
     return PartList(result);
   }
 

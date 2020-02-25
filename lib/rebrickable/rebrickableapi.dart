@@ -35,7 +35,7 @@ class RebrickableApi {
     return _handlePagedResponse<Set>(url, (item) => Set.fromJson(item));
   }
 
-  Future<Part> searchPart(String partNum, int page) async {
+  Future<Part> searchPart(String partNum) async {
     var url = "$BASE_URL/parts/$partNum";
     return _handleResponse(url, (body) => Part.fromJson(body));
   }

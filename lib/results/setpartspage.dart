@@ -69,19 +69,70 @@ class _SetPartsPageState extends State<SetPartsPage> {
                   width: 80, child: Image.network(result.part.partImgUrl)),
               title: Text("${result.part.name}, count: ${result.quantity}"),
               subtitle: Text("In sets: ${result.numSets}"),
+              onTap: () { _showPartDialog(result); },
             ));
         }
       },
     );
   }
 
+
+
+  _showPartDialog(SetPart setPart) async {
+    _showLoadingDialog();
+
+    var apiKey = await loadApiKey();
+    var response = await RebrickableApi(apiKey).searchPart(
+        "${setPart.part.partNum}");
+
+    // close loading dialog
+    Navigator.pop(context);
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              title: Text(setPart.part.name),
+
+              content: Container(
+                height: 200,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Center(child: SizedBox(
+                        width: 80, child: Image.network(response.partImgUrl))),
+                    Text("Years: ${response.yearFrom} -  ${response.yearTo}"),
+                    Text("In sets: ${setPart.numSets}"),
+
+                  ],
+                ),
+              ));
+        });
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Loading..."),
+            content: Container(
+                height: 100,
+                child: Center(child: CircularProgressIndicator())
+            ),
+          );
+        }
+    );
+  }
+
   Widget _buildProgressIndicator() {
-    return new Padding(
+    return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
+      child: Center(
+        child: Opacity(
           opacity: isLoading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
+          child: CircularProgressIndicator(),
         ),
       ),
     );
