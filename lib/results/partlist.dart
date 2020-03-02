@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lego_parts_counter/rebrickable/baseresponse.dart';
 import 'package:lego_parts_counter/rebrickable/model/part.dart';
 
 class PartList extends StatelessWidget {

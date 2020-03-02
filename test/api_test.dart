@@ -24,7 +24,7 @@ void main() {
   test('Test search by part number', () async {
     var credentials = await _readCredentials();
     var rebrickable = RebrickableApi(credentials["api_key"]);
-    var result = await rebrickable.searchPart("6020", 1);
+    var result = await rebrickable.searchPart("6020");
     expect(result.name, "Bar 7 x 3 with Double Clips (Ladder)");
   });
 

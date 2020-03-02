@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lego_parts_counter/partdetails/partdetailspage.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:lego_parts_counter/rebrickable/baseresponse.dart';
 import 'package:lego_parts_counter/rebrickable/model/setpart.dart';
 import 'package:lego_parts_counter/rebrickable/rebrickableapi.dart';
@@ -76,8 +78,6 @@ class _SetPartsPageState extends State<SetPartsPage> {
     );
   }
 
-
-
   _showPartDialog(SetPart setPart) async {
     _showLoadingDialog();
 
@@ -95,16 +95,47 @@ class _SetPartsPageState extends State<SetPartsPage> {
               title: Text(setPart.part.name),
 
               content: Container(
-                height: 200,
+                height: 160,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Center(child: SizedBox(
                         width: 80, child: Image.network(response.partImgUrl))),
-                    Text("Years: ${response.yearFrom} -  ${response.yearTo}"),
-                    Text("In sets: ${setPart.numSets}"),
-
+                    InkWell(
+                        child: Padding(
+                            padding: EdgeInsets.only(top: 8, bottom: 8),
+                            child: Text("Open in browser",
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue))
+                        ),
+                        onTap: () => _launchURL(response.partUrl)),
+                    Row(children: <Widget>[
+                      Text("Part num: ",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text("${response.partNum}"),
+                    ]),
+                    Row(children: <Widget>[
+                      Text("Years: ",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text("${response.yearFrom} -  ${response.yearTo}"),
+                    ]),
+                    Row(children: <Widget>[
+                      Text("In sets: ",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      InkWell(
+                        child: Text("${setPart.numSets}",
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue)),
+                        onTap: () {
+                          Navigator.push(
+                              context, MaterialPageRoute(builder: (context) =>
+                              PartDetailsPage(response.partNum)));
+                        },
+                      ),
+                    ])
                   ],
                 ),
               ));
@@ -157,4 +188,12 @@ class _SetPartsPageState extends State<SetPartsPage> {
   }
 
   Future<String> loadApiKey() async => await LocalStorage().getApiKey();
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
