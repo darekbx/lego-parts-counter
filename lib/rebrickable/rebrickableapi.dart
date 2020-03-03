@@ -24,7 +24,7 @@ import 'package:lego_parts_counter/rebrickable/model/setpart.dart';
 class RebrickableApi {
 
   final String BASE_URL = "https://rebrickable.com/api/v3/lego/";
-  final int PAGE_SIZE = 100;
+  final int PAGE_SIZE = 200;
 
   String apiKey;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lego_parts_counter/rebrickable/model/part.dart';
+import 'package:lego_parts_counter/utils/partdialog.dart';
 
 class PartList extends StatelessWidget {
 
@@ -18,6 +19,7 @@ class PartList extends StatelessWidget {
             title: Text("${result.partNum} ${result.name}"),
             subtitle: Text(
                 "Years: ${result.yearFrom} -  ${result.yearTo}"),
+            onTap: () { PartDialog(context).showPartDialog(result); },
           ));
       },
     );

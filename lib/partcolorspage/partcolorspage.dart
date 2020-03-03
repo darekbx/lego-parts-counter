@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:lego_parts_counter/rebrickable/model/setpart.dart';
+import 'package:lego_parts_counter/rebrickable/model/color.dart';
 import 'package:lego_parts_counter/rebrickable/rebrickableapi.dart';
+import 'package:lego_parts_counter/setslist/setslistpage.dart';
 import 'package:lego_parts_counter/storage/localstorage.dart';
-import 'package:lego_parts_counter/utils/setpartdialog.dart';
 
-class SetPartsPage extends StatefulWidget {
+class PartColorsPage extends StatefulWidget {
 
-  String setNumber;
+  String partNumber;
 
-  SetPartsPage(this.setNumber);
+  PartColorsPage(this.partNumber);
 
   @override
-  _SetPartsPageState createState() => _SetPartsPageState();
+  _PartColorsPageState createState() => _PartColorsPageState();
 }
 
-class _SetPartsPageState extends State<SetPartsPage> {
+class _PartColorsPageState extends State<PartColorsPage> {
 
   ScrollController _scrollController = new ScrollController();
 
-  List<SetPart> _parts = List();
+  List<Color> _colors = List();
   int page = 1;
   bool hasMore = true;
   bool isLoading = false;
@@ -46,7 +46,7 @@ class _SetPartsPageState extends State<SetPartsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text("Lego Parts - from ${widget.setNumber}")
+            title: Text("Lego Part Colors - for ${widget.partNumber}")
         ),
         body: _buildList(),
         resizeToAvoidBottomPadding: false
@@ -55,20 +55,25 @@ class _SetPartsPageState extends State<SetPartsPage> {
 
   Widget _buildList() {
     return ListView.builder(
-      itemCount: _parts.length + 1 /* For progress */,
+      itemCount: _colors.length + 1 /* For progress */,
       controller: _scrollController,
       itemBuilder: (context, index) {
-        if (index == _parts.length) {
+        if (index == _colors.length) {
           return _buildProgressIndicator();
         } else {
-          var result = _parts[index];
+          var result = _colors[index];
           return
             Card(child: ListTile(
-              leading: SizedBox(
-                  width: 80, child: Image.network(result.part.partImgUrl)),
-              title: Text("${result.part.name}, count: ${result.quantity}"),
-              subtitle: Text("In sets: ${result.numSets}"),
-              onTap: () { SetPartDialog(context).showSetPartDialog(result); },
+                leading: SizedBox(
+                    width: 80, child: Image.network(result.partImgUrl)),
+                title: Text("${result.colorName}"),
+                subtitle: Text("In sets: ${result.numSets}", style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    color: Colors.blue)),
+                onTap: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) =>
+                      SetsListPage(widget.partNumber, result.colorId))); }
             ));
         }
       },
@@ -96,12 +101,13 @@ class _SetPartsPageState extends State<SetPartsPage> {
     });
 
     var apiKey = await loadApiKey();
-    var response = await RebrickableApi(apiKey).fetchSetParts(widget.setNumber, page++);
+    var response = await RebrickableApi(apiKey).fetchPartColors(widget.partNumber, page++);
     hasMore = response.next != null;
 
+    var filtered = response.results.where((color) => color.numSets > 0);
     setState(() {
       isLoading = false;
-      _parts.addAll(response.results);
+      _colors.addAll(filtered);
     });
   }
 
