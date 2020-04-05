@@ -89,14 +89,16 @@ class _SetPartsPageState extends State<SetPartsPage> {
         loadingBuilder: (BuildContext context, Widget child,
             ImageChunkEvent loadingProgress) {
           if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null ?
-              loadingProgress.cumulativeBytesLoaded /
-                  loadingProgress.expectedTotalBytes
-                  : null,
-            ),
-          );
+          return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null ?
+                  loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes
+                      : null,
+                ),
+              ));
         });
   }
 
