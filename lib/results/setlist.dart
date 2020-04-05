@@ -34,7 +34,7 @@ class SetList extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                     context, MaterialPageRoute(
-                    builder: (context) => SetPartsPage(result.number)));
+                    builder: (context) => SetPartsPage(result.number, result.imageUrl)));
               },
             ));
         }
